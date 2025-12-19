@@ -76,30 +76,20 @@ npm run generate-keys
 
 ### Running the Demo
 
-You need to run three services:
+For the full embedded integration demo, you need to build the widget first (so the host can load `widget.iife.js`), then run the backend and host:
 
 ```bash
-# Terminal 1: Widget Backend (localhost:3002)
-npm run dev:widget-backend
-
-# Terminal 2: Widget Frontend - Build for embedding
-cd widget/frontend && npm run build
-
-# Terminal 3: Host Application (localhost:3000)
-npm run dev:host
-```
-
-Or run everything at once:
-
-```bash
-# Build widget first
+# 1. Build the widget (creates widget.iife.js)
 cd widget/frontend && npm run build && cd ../..
 
-# Start all services (backend + host)
-npm run dev
+# 2. Run backend + host (two terminals, or use concurrently)
+npm run dev:widget-backend  # Terminal 1
+npm run dev:host            # Terminal 2
 ```
 
 Then open http://localhost:3000 in your browser.
+
+> **Note:** `npm run dev` runs all three services in dev mode, which is useful for development but the widget frontend dev server (port 3001) is separate from the embedded widget. For the embedded demo, ensure the widget is built first.
 
 ### Standalone Widget Development
 
@@ -126,7 +116,7 @@ widget-embedding-demo/
 │   │   │   ├── context/       # AuthContext (dual token management)
 │   │   │   ├── api/           # API client with Bearer token
 │   │   │   ├── utils/         # JWT decoder (client-side)
-│   │   │   ├── dev/           # MockAuthProvider, DevToolbar
+│   │   │   ├── dev/           # MockAuthProvider (includes DevToolbar)
 │   │   │   ├── embed.tsx      # Production entry (window.MyWidget)
 │   │   │   ├── standalone.tsx # Development entry
 │   │   │   └── widget-api.tsx # Global API implementation

@@ -108,8 +108,9 @@ app.listen(PORT, () => {
 ║  Endpoints:                                                      ║
 ║  ──────────────────────────────────────────────────────────────  ║
 ║  GET  /.well-known/jwks.json  - JWKS endpoint (mock Auth0)      ║
-║  POST /api/feedback           - Submit feedback (requires JWT)   ║
-║  GET  /api/feedback           - Get all feedback (requires JWT)  ║
+║  POST /api/feedback           - Submit feedback (auth optional)  ║
+║  GET  /api/feedback           - Get all feedback (auth optional) ║
+║  GET  /api/feedback/me        - Get user's feedback (auth req'd) ║
 ║  GET  /health                 - Health check                     ║
 ║                                                                  ║
 ║  ⚠️  Note: JWKS endpoint simulates Auth0's endpoint.             ║
