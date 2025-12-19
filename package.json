@@ -1,0 +1,26 @@
+{
+  "name": "widget-embedding-demo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "widget/frontend",
+    "widget/backend",
+    "host-app"
+  ],
+  "scripts": {
+    "dev": "concurrently -n \"widget-be,widget-fe,host\" -c \"blue,green,yellow\" \"npm run dev:widget-backend\" \"npm run dev:widget-frontend\" \"npm run dev:host\"",
+    "dev:widget-backend": "npm run dev -w widget-backend",
+    "dev:widget-frontend": "npm run dev -w widget-frontend",
+    "dev:host": "npm run dev -w host-app",
+    "build": "npm run build -w widget-frontend && npm run build -w widget-backend && npm run build -w host-app",
+    "generate-keys": "npx tsx scripts/generate-keys.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
+
+

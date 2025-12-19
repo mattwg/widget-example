@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Widget - Standalone Development Mode</title>
+    <!-- Load Inter font for widget typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- 
+      STANDALONE DEVELOPMENT MODE
+      ============================
+      This HTML file is only used during development (npm run dev).
+      When built for production, the widget is bundled as an IIFE
+      that can be embedded in any host application.
+    -->
+    <script type="module" src="/src/standalone.tsx"></script>
+  </body>
+</html>
+
+

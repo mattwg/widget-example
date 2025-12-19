@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Widget-specific base styles */
+.widget-container {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom animations */
+@keyframes widget-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes widget-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.widget-animate-fade-in {
+  animation: widget-fade-in 0.3s ease-out;
+}
+
+.widget-animate-pulse {
+  animation: widget-pulse 1.5s ease-in-out infinite;
+}
+
+/* Star rating hover effects */
+.widget-star-button {
+  transition: transform 0.1s ease-out;
+}
+
+.widget-star-button:hover {
+  transform: scale(1.15);
+}
+
+.widget-star-button:active {
+  transform: scale(0.95);
+}
+
+

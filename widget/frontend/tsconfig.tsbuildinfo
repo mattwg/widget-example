@@ -1,0 +1,1 @@
+{"root":["./src/embed.tsx","./src/standalone.tsx","./src/vite-env.d.ts","./src/widget-api.tsx","./src/api/client.ts","./src/components/feedbackwidget.tsx","./src/components/userbadge.tsx","./src/context/authcontext.tsx","./src/dev/mockauthprovider.tsx","./src/dev/generatemocktokens.ts","./src/stores/tokenstore.ts","./src/utils/jwt-decoder.ts"],"version":"5.6.3"}
