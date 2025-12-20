@@ -15,8 +15,8 @@ A comprehensive demo project that teaches how to build an embeddable HTML widget
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              HOST APPLICATION                                │
-│                              (localhost:3000)                                │
+│                              HOST APPLICATION                               │
+│                              (localhost:3000)                               │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │  1. User logs in → Mock Auth0 generates tokens (RS256)                 │ │
 │  │  2. Host passes tokens to widget: MyWidget.init({accessToken, idToken})│ │
@@ -25,8 +25,8 @@ A comprehensive demo project that teaches how to build an embeddable HTML widget
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           EMBEDDED WIDGET (SPA)                              │
-│                     (Loaded via <script> from backend)                       │
+│                           EMBEDDED WIDGET (SPA)                             │
+│                     (Loaded via <script> from backend)                      │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │  • Decodes ID token client-side → Displays user info                   │ │
 │  │  • Sends Access token in API calls → Authorization header              │ │
@@ -35,8 +35,8 @@ A comprehensive demo project that teaches how to build an embeddable HTML widget
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           WIDGET BACKEND API                                 │
-│                           (localhost:3002)                                   │
+│                           WIDGET BACKEND API                                │
+│                           (localhost:3002)                                  │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │  1. Receives request with Authorization: Bearer <access_token>         │ │
 │  │  2. Fetches public key from JWKS endpoint                              │ │
@@ -48,8 +48,8 @@ A comprehensive demo project that teaches how to build an embeddable HTML widget
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                      JWKS ENDPOINT (Mock Auth0)                              │
-│                  localhost:3002/.well-known/jwks.json                        │
+│                      JWKS ENDPOINT (Mock Auth0)                             │
+│                  localhost:3002/.well-known/jwks.json                       │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │  ⚠️ In production, this would be Auth0's endpoint:                     │ │
 │  │     https://YOUR_DOMAIN.auth0.com/.well-known/jwks.json                │ │
