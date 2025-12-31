@@ -37,10 +37,19 @@ import { createRoot, type Root } from 'react-dom/client';
 import { AuthProvider, initializeTokenStore, setStoreTokens, clearStoreTokens } from './context/AuthContext';
 import { FeedbackWidget } from './components/FeedbackWidget';
 import { setApiAccessToken } from './api/client';
+import { startTokenValidation, stopTokenValidation } from './services/tokenValidator';
+import { setExpirationBuffer } from './stores/tokenStore';
 import type { WidgetConfig, WidgetAPI } from 'shared';
 
 // Import styles (bundled into the IIFE)
 import './index.css';
+
+// ===========================================
+// Default Configuration
+// ===========================================
+
+const DEFAULT_TOKEN_CHECK_INTERVAL = 60 * 1000; // 60 seconds
+const DEFAULT_TOKEN_EXPIRATION_BUFFER = 5 * 60 * 1000; // 5 minutes
 
 // ===========================================
 // Internal State
@@ -149,12 +158,26 @@ export function createWidget(): WidgetAPI {
     async init(config: WidgetConfig) {
       console.log('🚀 Widget: Initializing...');
       
+      // Calculate validation config with defaults
+      const tokenCheckInterval = config.tokenCheckInterval ?? DEFAULT_TOKEN_CHECK_INTERVAL;
+      const tokenExpirationBuffer = config.tokenExpirationBuffer ?? DEFAULT_TOKEN_EXPIRATION_BUFFER;
+      
       // Prevent double initialization - if already initialized, just update config
       if (root) {
         console.log('⚠️ Widget: Already initialized, updating config');
         currentConfig = config;
         initializeTokenStore(config.accessToken, config.idToken);
         setApiAccessToken(config.accessToken ?? null);
+        
+        // Update expiration buffer and restart validation
+        setExpirationBuffer(tokenExpirationBuffer);
+        startTokenValidation({
+          getTokens: config.getTokens,
+          tokenCheckInterval,
+          tokenExpirationBuffer,
+          onEvent: config.onEvent,
+        });
+        
         render();
         config.onEvent?.({ type: 'INITIALIZED' });
         return;
@@ -172,8 +195,9 @@ export function createWidget(): WidgetAPI {
       // Store config
       currentConfig = config;
       
-      // Initialize token store with initial tokens
+      // Initialize token store with initial tokens and expiration buffer
       initializeTokenStore(config.accessToken, config.idToken);
+      setExpirationBuffer(tokenExpirationBuffer);
       
       // Set up API client with access token
       setApiAccessToken(config.accessToken ?? null);
@@ -198,11 +222,24 @@ export function createWidget(): WidgetAPI {
       root = createRoot(shadowContainer);
       render();
       
+      // Start token validation timer (if tokens provided)
+      if (config.accessToken) {
+        startTokenValidation({
+          getTokens: config.getTokens,
+          tokenCheckInterval,
+          tokenExpirationBuffer,
+          onEvent: config.onEvent,
+        });
+      }
+      
       console.log('✅ Widget: Initialized successfully');
       console.log(`   Container: #${config.targetId}`);
       console.log(`   Theme: ${config.theme || 'light'}`);
       console.log(`   Authenticated: ${!!config.accessToken}`);
       console.log(`   Style Isolation: Shadow DOM enabled`);
+      console.log(`   Token Validation: ${config.accessToken ? 'enabled' : 'disabled'}`);
+      console.log(`   Check Interval: ${tokenCheckInterval}ms`);
+      console.log(`   Expiration Buffer: ${tokenExpirationBuffer}ms`);
       
       // Notify host
       config.onEvent?.({ type: 'INITIALIZED' });
@@ -220,6 +257,19 @@ export function createWidget(): WidgetAPI {
       // Update token store - this will trigger React re-renders
       // via useSyncExternalStore in all subscribed components
       setStoreTokens(accessToken, idToken);
+      
+      // Restart token validation with updated tokens (if config available)
+      if (currentConfig) {
+        const tokenCheckInterval = currentConfig.tokenCheckInterval ?? DEFAULT_TOKEN_CHECK_INTERVAL;
+        const tokenExpirationBuffer = currentConfig.tokenExpirationBuffer ?? DEFAULT_TOKEN_EXPIRATION_BUFFER;
+        
+        startTokenValidation({
+          getTokens: currentConfig.getTokens,
+          tokenCheckInterval,
+          tokenExpirationBuffer,
+          onEvent: currentConfig.onEvent,
+        });
+      }
       
       console.log('✅ Widget: Tokens set successfully');
     },
@@ -244,6 +294,9 @@ export function createWidget(): WidgetAPI {
      */
     destroy() {
       console.log('💥 Widget: Destroying...');
+      
+      // Stop token validation timer
+      stopTokenValidation();
       
       if (root) {
         root.unmount();

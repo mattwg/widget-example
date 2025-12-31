@@ -27,7 +27,7 @@ interface FeedbackWidgetProps {
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
 
 export function FeedbackWidget({ theme = 'light', onEvent }: FeedbackWidgetProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, tokenStatus, tokenTTL } = useAuth();
   
   // Form state
   const [rating, setRating] = useState<number>(0);
@@ -36,9 +36,19 @@ export function FeedbackWidget({ theme = 'light', onEvent }: FeedbackWidgetProps
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
   
+  // Check if tokens are expired (for authenticated users)
+  const isTokenExpired = isAuthenticated && tokenStatus === 'expired';
+  const isTokenExpiring = isAuthenticated && tokenStatus === 'expiring';
+  
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Block submission if tokens are expired
+    if (isTokenExpired) {
+      setErrorMessage('Your session has expired. Please refresh the page.');
+      return;
+    }
     
     if (rating === 0) {
       setErrorMessage('Please select a rating');
@@ -178,8 +188,26 @@ export function FeedbackWidget({ theme = 'light', onEvent }: FeedbackWidgetProps
         <UserBadge size="sm" />
       </div>
       
+      {/* Token expired warning */}
+      {isTokenExpired && (
+        <div className="widget-mb-4 widget-p-3 widget-bg-red-50 widget-border widget-border-red-200 widget-rounded-lg">
+          <p className="widget-text-xs widget-text-red-700">
+            ⚠️ Your session has expired. Please refresh the page or log in again to continue.
+          </p>
+        </div>
+      )}
+      
+      {/* Token expiring soon warning */}
+      {isTokenExpiring && !isTokenExpired && (
+        <div className="widget-mb-4 widget-p-3 widget-bg-yellow-50 widget-border widget-border-yellow-200 widget-rounded-lg">
+          <p className="widget-text-xs widget-text-yellow-700">
+            ⏳ Your session expires in {Math.ceil(tokenTTL / 60)} minute{tokenTTL > 60 ? 's' : ''}. Refreshing automatically...
+          </p>
+        </div>
+      )}
+      
       {/* Auth status message */}
-      {!isAuthenticated && (
+      {!isAuthenticated && !isTokenExpired && (
         <div className="widget-mb-4 widget-p-3 widget-bg-blue-50 widget-border widget-border-blue-100 widget-rounded-lg">
           <p className="widget-text-xs widget-text-blue-700">
             💡 You're submitting as anonymous. Log in to the host app to submit with your account.
@@ -237,12 +265,12 @@ export function FeedbackWidget({ theme = 'light', onEvent }: FeedbackWidgetProps
         {/* Submit button */}
         <button
           type="submit"
-          disabled={submitState === 'submitting' || rating === 0}
+          disabled={submitState === 'submitting' || rating === 0 || isTokenExpired}
           className={`
             widget-w-full widget-py-2.5 widget-px-4 widget-rounded-lg widget-font-medium widget-text-sm
             widget-transition-colors widget-duration-200
             focus:widget-outline-none focus:widget-ring-2 focus:widget-ring-widget-primary focus:widget-ring-offset-2
-            ${rating === 0
+            ${rating === 0 || isTokenExpired
               ? 'widget-bg-gray-200 widget-text-gray-400 widget-cursor-not-allowed'
               : submitState === 'submitting'
                 ? 'widget-bg-widget-primary/70 widget-text-white widget-cursor-wait'
@@ -273,6 +301,8 @@ export function FeedbackWidget({ theme = 'light', onEvent }: FeedbackWidgetProps
               </svg>
               Submitting...
             </span>
+          ) : isTokenExpired ? (
+            'Session Expired'
           ) : (
             'Submit Feedback'
           )}
@@ -290,5 +320,6 @@ export function FeedbackWidget({ theme = 'light', onEvent }: FeedbackWidgetProps
     </div>
   );
 }
+
 
 

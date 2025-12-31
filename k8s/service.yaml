@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-widget-backend-service
+  namespace: default
+  labels:
+    app: demo-widget-backend
+    environment: dev
+    project: demo-widget
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-widget-backend
+  ports:
+  - name: http
+    port: 3002
+    targetPort: 3002
+    protocol: TCP
+

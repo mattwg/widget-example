@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-widget-backend
+  namespace: default
+  labels:
+    app: demo-widget-backend
+    environment: dev
+    project: demo-widget
+    managed-by: demo-widget-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-widget-backend
+  template:
+    metadata:
+      labels:
+        app: demo-widget-backend
+        environment: dev
+        project: demo-widget
+    spec:
+      containers:
+      - name: widget-backend
+        image: 715841348893.dkr.ecr.us-west-2.amazonaws.com/demo-widget:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3002
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3002"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      restartPolicy: Always
+

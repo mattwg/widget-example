@@ -129,6 +129,22 @@ export interface JWKS {
 // ===========================================
 
 /**
+ * Result from the host's getTokens callback.
+ * Returns fresh tokens or null if the session has expired.
+ */
+export interface TokenRefreshResult {
+  /** Fresh access token */
+  accessToken: string;
+  /** Fresh ID token */
+  idToken: string;
+}
+
+/**
+ * Token status indicating the current state of authentication tokens.
+ */
+export type TokenStatus = 'valid' | 'expiring' | 'expired';
+
+/**
  * Configuration options for initializing the widget.
  */
 export interface WidgetConfig {
@@ -142,6 +158,39 @@ export interface WidgetConfig {
   theme?: 'light' | 'dark';
   /** Callback for widget events */
   onEvent?: (event: WidgetEvent) => void;
+  
+  // ===========================================
+  // Token Refresh Configuration
+  // ===========================================
+  
+  /**
+   * Callback to get fresh tokens from the host application.
+   * 
+   * The widget will call this when tokens are about to expire.
+   * Return fresh tokens or null if the session has expired.
+   * 
+   * @example
+   * getTokens: async () => {
+   *   // With real Auth0:
+   *   const accessToken = await auth0.getAccessTokenSilently();
+   *   const idToken = await auth0.getIdTokenClaims().__raw;
+   *   return { accessToken, idToken };
+   * }
+   */
+  getTokens?: () => Promise<TokenRefreshResult | null>;
+  
+  /**
+   * How often to check token expiration (in milliseconds).
+   * Default: 60000 (60 seconds)
+   */
+  tokenCheckInterval?: number;
+  
+  /**
+   * Time buffer before expiration to trigger refresh (in milliseconds).
+   * When token TTL falls below this threshold, widget will attempt refresh.
+   * Default: 300000 (5 minutes)
+   */
+  tokenExpirationBuffer?: number;
 }
 
 /**
@@ -151,7 +200,11 @@ export type WidgetEvent =
   | { type: 'FEEDBACK_SUBMITTED'; payload: { rating: number; comment: string } }
   | { type: 'ERROR'; payload: { message: string; code?: string } }
   | { type: 'INITIALIZED' }
-  | { type: 'DESTROYED' };
+  | { type: 'DESTROYED' }
+  // Token lifecycle events
+  | { type: 'TOKENS_EXPIRING_SOON'; payload: { expiresIn: number } }
+  | { type: 'TOKENS_EXPIRED' }
+  | { type: 'TOKENS_REFRESHED' };
 
 /**
  * Global API exposed by the widget via window.MyWidget

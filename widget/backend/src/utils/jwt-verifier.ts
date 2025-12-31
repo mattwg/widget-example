@@ -13,60 +13,32 @@
 
 import jwt from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
-import { AUTH_CONFIG, type AccessTokenClaims, type JWKS, type RSAPublicJWK } from 'shared';
+import { AUTH_CONFIG, DEMO_JWKS, type AccessTokenClaims, type JWKS, type RSAPublicJWK } from 'shared';
 
 // ===========================================
-// JWKS Cache
+// JWKS Source
 // ===========================================
-// Cache the JWKS to avoid fetching on every request.
-// In production, you'd want a more sophisticated cache
-// with proper TTL and refresh logic.
-
-interface JWKSCache {
-  jwks: JWKS | null;
-  fetchedAt: number;
-  ttlMs: number;
-}
-
-const jwksCache: JWKSCache = {
-  jwks: null,
-  fetchedAt: 0,
-  ttlMs: 60 * 60 * 1000, // 1 hour cache
-};
+// In this demo, we use the embedded JWKS directly since we host it ourselves.
+// In production with Auth0, you would fetch from Auth0's JWKS endpoint.
 
 /**
- * Fetch JWKS from the configured endpoint.
+ * Get JWKS for token verification.
  * 
- * In production with Auth0:
- *   JWKS_URI = 'https://YOUR_DOMAIN.auth0.com/.well-known/jwks.json'
+ * DEMO MODE: Uses embedded JWKS from shared package
+ * PRODUCTION: Would fetch from Auth0's JWKS endpoint
  * 
- * In this demo:
- *   JWKS_URI = 'http://localhost:3002/.well-known/jwks.json'
+ * In production with Auth0, replace this function body with:
+ *   const response = await fetch(AUTH_CONFIG.JWKS_URI);
+ *   return response.json();
  */
 async function fetchJWKS(): Promise<JWKS> {
-  const now = Date.now();
+  // In demo mode, use the embedded JWKS directly
+  // This avoids network issues when running in Kubernetes
+  // where the pod can't resolve its own external domain
+  console.log('🔑 Using embedded JWKS (demo mode)');
+  console.log('   In production with Auth0, this would fetch from Auth0\'s servers');
   
-  // Return cached JWKS if still valid
-  if (jwksCache.jwks && (now - jwksCache.fetchedAt) < jwksCache.ttlMs) {
-    return jwksCache.jwks;
-  }
-  
-  console.log(`🔑 Fetching JWKS from: ${AUTH_CONFIG.JWKS_URI}`);
-  console.log('   (In production, this would fetch from Auth0)');
-  
-  const response = await fetch(AUTH_CONFIG.JWKS_URI);
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch JWKS: ${response.status} ${response.statusText}`);
-  }
-  
-  const jwks = await response.json() as JWKS;
-  
-  // Update cache
-  jwksCache.jwks = jwks;
-  jwksCache.fetchedAt = now;
-  
-  return jwks;
+  return DEMO_JWKS as JWKS;
 }
 
 /**

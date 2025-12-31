@@ -66,7 +66,7 @@ export const AUTH_CONFIG = {
    * This is ONLY because we don't have a real Auth0 account.
    * In reality, you would NEVER host your own JWKS - Auth0 does that.
    */
-  JWKS_URI: 'http://localhost:3002/.well-known/jwks.json',
+  JWKS_URI: 'https://demo-widget.dev.lxtp.chegg.services/.well-known/jwks.json',
 
   // ==========================================
   // Token Expiration
@@ -129,7 +129,7 @@ export type AvailableScope = typeof AUTH_CONFIG.AVAILABLE_SCOPES[number];
  */
 export const SERVICE_URLS = {
   /** Widget backend API base URL */
-  WIDGET_BACKEND: 'http://localhost:3002',
+  WIDGET_BACKEND: 'https://demo-widget.dev.lxtp.chegg.services',
   
   /** Widget frontend dev server (standalone mode) */
   WIDGET_FRONTEND_DEV: 'http://localhost:3001',
@@ -137,5 +137,7 @@ export const SERVICE_URLS = {
   /** Host application dev server */
   HOST_APP: 'http://localhost:3000',
 } as const;
+
+
 
 
