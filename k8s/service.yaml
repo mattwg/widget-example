@@ -17,3 +17,5 @@ spec:
     targetPort: 3002
     protocol: TCP
 
+
+

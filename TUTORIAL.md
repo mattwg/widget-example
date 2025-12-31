@@ -1279,3 +1279,5 @@ You've learned how to build an embeddable widget with:
 The foundational patterns—entry points, initialization API, auth flow, dev mode—are the hard part. Once those are solid, extending the widget is just adding fields and logic within that structure.
 
 **Now go build something!**
+
+

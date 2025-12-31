@@ -248,3 +248,5 @@ The issue had two components:
 - `widget/frontend/src/widget-api.tsx` - Simplified, added double-init protection
 - `widget/frontend/src/dev/MockAuthProvider.tsx` - Updated to use new store pattern
 
+
+
